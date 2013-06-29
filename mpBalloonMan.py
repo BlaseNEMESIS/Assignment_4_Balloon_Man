@@ -13,7 +13,7 @@ pygame.init()
 
 #Creates the balloon man sprite and its controls
 class BalloonMan(pygame.sprite.Sprite):
-    #first initializtion of the ballon man
+    #initializtion of the ballon man
     def __init__(self):
         #load the sprite onto the screen
         pygame.sprite.Sprite.__init__(self)
@@ -25,7 +25,7 @@ class BalloonMan(pygame.sprite.Sprite):
     #update the sprite of balloon man  
     def update(self):
         mousex, mousey = pygame.mouse.get_pos()
-        self.rect.center = (30, mousey)
+        self.rect.center = (mousex, mousey)
     #end of update method
 #end of the balloonMan class
  

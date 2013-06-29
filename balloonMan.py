@@ -9,31 +9,16 @@
 
 #Version 0.1 - Code from Lesson 7
 #Version 0.2 - Added the Balloon Man Class
+#Version 0.25 - Added the Coin Class
 
 import pygame, random
 pygame.init()
 
 screen = pygame.display.set_mode((640, 480))
 
-class Plane(pygame.sprite.Sprite):
-    def __init__(self):
-        pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.image.load("plane.gif")
-        self.image = self.image.convert()
-        self.rect = self.image.get_rect()
-        
-        if not pygame.mixer:
-            print("problem with sound")
-        else:
-            pygame.mixer.init()
-            self.sndYay = pygame.mixer.Sound("yay.ogg")
-            self.sndThunder = pygame.mixer.Sound("thunder.ogg")
-            self.sndEngine = pygame.mixer.Sound("engine.ogg")
-            self.sndEngine.play(-1)
-
 #Creates the balloon man sprite and its controls
 class BalloonMan(pygame.sprite.Sprite):
-    #first initializtion of the ballon man
+    #initializtion of the ballon man
     def __init__(self):
         #load the sprite onto the screen
         pygame.sprite.Sprite.__init__(self)
@@ -54,28 +39,39 @@ class BalloonMan(pygame.sprite.Sprite):
     #update the sprite of balloon man  
     def update(self):
         mousex, mousey = pygame.mouse.get_pos()
-        self.rect.center = (30, mousey)
+        self.rect.center = (mousex, mousey)
     #end of update method
 #end of the balloonMan class
                 
-class Island(pygame.sprite.Sprite):
+#Creates the coin sprite and its movement      
+class Coin(pygame.sprite.Sprite):
+    #method to initialize the coin sprite
     def __init__(self):
+        #create the coin sprite
         pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.image.load("island.gif")
+        self.image = pygame.image.load("coin.gif")
         self.image = self.image.convert()
         self.rect = self.image.get_rect()
         self.reset()
         
-        self.dy = 5
+        self.dx = 5
+    #end of initialize method
     
+    #method to update coin sprite
     def update(self):
-        self.rect.centery += self.dy
-        if self.rect.top > screen.get_height():
+        #scroll horizontally until the right side of the coin hits the edge
+        self.rect.centerx -= self.dx
+        if self.rect.right < 0:
             self.reset()
-            
+    #end of update method
+    
+    #method to reset coin sprite       
     def reset(self):
-        self.rect.top = 0
-        self.rect.centerx = random.randrange(0, screen.get_width())
+        #randomly select the height the coin will be spawn from
+        randomy = random.randint(0, 400)
+        self.rect.center = (640, randomy)
+    #end of reset method
+#end of Coin class
       
 class Cloud(pygame.sprite.Sprite):
     def __init__(self):

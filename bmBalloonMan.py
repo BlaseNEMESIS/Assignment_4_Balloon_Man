@@ -1,4 +1,4 @@
-# Source File Name: mpBalloonMan.py
+# Source File Name: bmBalloonMan.py
 # Author's Name: Jonathan Hodder
 # Last Modified By: Jonathan Hodder
 # Date Last Modified: Saturday June 29th 2013

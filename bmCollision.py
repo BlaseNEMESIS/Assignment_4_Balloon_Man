@@ -1,20 +1,12 @@
-# Source File Name: balloonMan.py
+# Source File Name: bmCollision.py
 # Author's Name: Jonathan Hodder
 # Last Modified By: Jonathan Hodder
 # Date Last Modified: Saturday June 29th 2013
-#Program Description: You are the balloon man.  Fly around the sky collecting coins to increase
-#your score.  Also keep an eye out for balloons as they will give you an extra balloon.  Watch
-#out though birds fly through the sky and colliding with them will cause you to lose a balloon.
-#If you run out of ballons the game is over.
+#Program Description: This is the test code for the object collision.  
+#My goal in this code is have object collision cause different effects 
 
 #Version 0.1 - Code from Lesson 7
-#Version 0.2 - Added the Balloon Man Class
-#Version 0.25 - Added the Coin Class - Also adjusted image sizes
-#Version 0.3 - Added the Balloon Class - Adjusted image sizes again
-#Version 0.35 - Added the Flying Bird Class
-#Version 0.4 - Removed the orignal code not looked at yet.  Added collision logic to my code
-#with sound effects.  The sound effects are from lesson 7.  Will add original sounds to my
-#code later on.
+#Version 1.0 - Have the sounds working when objects collider with each other
 
 import pygame, random
 pygame.init()
@@ -196,3 +188,4 @@ def main():
     pygame.mouse.set_visible(True) 
 if __name__ == "__main__":
     main()
+            

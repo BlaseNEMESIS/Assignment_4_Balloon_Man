@@ -1,48 +1,18 @@
-# Source File Name: mpBalloon.py
+# Source File Name: bmCoin.py
 # Author's Name: Jonathan Hodder
 # Last Modified By: Jonathan Hodder
 # Date Last Modified: Saturday June 29th 2013
-#Program Description: This is the test code for the Balloon Sprite.  My goal in this code is to add
-#the balloon to the screen and have it move. 
+#Program Description: This is the test code for the Coin Sprite.  My goal in this code is to add
+#the coin to the screen and have it move. 
 
 #Version 0.1 - Code from Lesson 7
-#Version 1.0 - Completed goals for ballon sprite class - Coin randomly moves from the bottom to 
-#the top of the screen and randomly selects a x value to move from
+#Version 1.0 - Completed goals for coin sprite class - Coin randomly moves from the right to 
+#the left of the screen and randomly selects a y value to move from
 
 import pygame, random
 pygame.init()
 
 screen = pygame.display.set_mode((640, 480))
-
-#Creates the balloon sprite and its movement      
-class Balloon(pygame.sprite.Sprite):
-    #method to initialize the coin sprite
-    def __init__(self):
-        #create the balloon sprite
-        pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.image.load("balloon.gif")
-        self.image = self.image.convert()
-        self.rect = self.image.get_rect()
-        self.reset()
-        
-        self.dy = 5
-    #end of initialize method
-    
-    #method to update balloon sprite
-    def update(self):
-        #scroll vertically until the bottom of the ballon hits the top
-        self.rect.centery -= self.dy
-        if self.rect.bottom < 0:
-            self.reset()
-    #end of update method
-    
-    #method to reset coin sprite       
-    def reset(self):
-        #randomly select the height the coin will be spawn from
-        randomx = random.randint(0, 640)
-        self.rect.center = (randomx, 480)
-    #end of reset method
-#end of Balloon class
 
 #Creates the balloon man sprite and its controls
 class BalloonMan(pygame.sprite.Sprite):
@@ -102,12 +72,11 @@ def main():
     background.fill((0, 0, 255))
     screen.blit(background, (0, 0))
     #create variables for the sprite classes
-    balloon = Balloon()
     balloonMan = BalloonMan()
     coin = Coin()
     
     #store the sprite variables into allSprites
-    allSprites = pygame.sprite.Group(balloon, coin, balloonMan)
+    allSprites = pygame.sprite.Group(balloonMan, coin)
     #set the fps
     clock = pygame.time.Clock()
     keepGoing = True
@@ -127,6 +96,7 @@ def main():
     
     #return mouse cursor
     pygame.mouse.set_visible(True) 
+#end of main method
 if __name__ == "__main__":
     main()
             

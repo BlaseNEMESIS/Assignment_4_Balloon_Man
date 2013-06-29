@@ -9,12 +9,43 @@
 
 #Version 0.1 - Code from Lesson 7
 #Version 0.2 - Added the Balloon Man Class
-#Version 0.25 - Added the Coin Class
+#Version 0.25 - Added the Coin Class - Also adjusted image sizes
+#Version 0.3 - Added the Balloon Class - Adjusted image sizes again
 
 import pygame, random
 pygame.init()
 
 screen = pygame.display.set_mode((640, 480))
+
+#Creates the balloon sprite and its movement      
+class Balloon(pygame.sprite.Sprite):
+    #method to initialize the coin sprite
+    def __init__(self):
+        #create the balloon sprite
+        pygame.sprite.Sprite.__init__(self)
+        self.image = pygame.image.load("balloon.gif")
+        self.image = self.image.convert()
+        self.rect = self.image.get_rect()
+        self.reset()
+        
+        self.dy = 5
+    #end of initialize method
+    
+    #method to update balloon sprite
+    def update(self):
+        #scroll vertically until the bottom of the ballon hits the top
+        self.rect.centery -= self.dy
+        if self.rect.bottom < 0:
+            self.reset()
+    #end of update method
+    
+    #method to reset coin sprite       
+    def reset(self):
+        #randomly select the height the coin will be spawn from
+        randomx = random.randint(0, 640)
+        self.rect.center = (randomx, 480)
+    #end of reset method
+#end of Balloon class
 
 #Creates the balloon man sprite and its controls
 class BalloonMan(pygame.sprite.Sprite):
@@ -68,7 +99,7 @@ class Coin(pygame.sprite.Sprite):
     #method to reset coin sprite       
     def reset(self):
         #randomly select the height the coin will be spawn from
-        randomy = random.randint(0, 400)
+        randomy = random.randint(0, 480)
         self.rect.center = (640, randomy)
     #end of reset method
 #end of Coin class
@@ -128,14 +159,14 @@ def game():
     background.fill((0, 0, 0))
     screen.blit(background, (0, 0))
     balloonMan = BalloonMan()
-    island = Island()
+    coin = Coin()
     cloud1 = Cloud()
     cloud2 = Cloud()
     cloud3 = Cloud()
     ocean = Ocean()
     scoreboard = Scoreboard()
 
-    friendSprites = pygame.sprite.OrderedUpdates(ocean, island, balloonMan)
+    friendSprites = pygame.sprite.OrderedUpdates(balloon, balloonMan, ocean, coin)
     cloudSprites = pygame.sprite.Group(cloud1, cloud2, cloud3)
     scoreSprite = pygame.sprite.Group(scoreboard)
 
@@ -151,9 +182,9 @@ def game():
         
         #check collisions
         
-        if balloonMan.rect.colliderect(island.rect):
+        if balloonMan.rect.colliderect(coin.rect):
             balloonMan.sndYay.play()
-            island.reset()
+            coin.reset()
             scoreboard.score += 100
 
         hitClouds = pygame.sprite.spritecollide(balloonMan, cloudSprites, False)

@@ -11,6 +11,7 @@
 #Version 0.2 - Added the Balloon Man Class
 #Version 0.25 - Added the Coin Class - Also adjusted image sizes
 #Version 0.3 - Added the Balloon Class - Adjusted image sizes again
+#Version 0.35 - Added the Flying Bird Class
 
 import pygame, random
 pygame.init()
@@ -104,26 +105,38 @@ class Coin(pygame.sprite.Sprite):
     #end of reset method
 #end of Coin class
       
-class Cloud(pygame.sprite.Sprite):
+#method flying bird creates a flying bird sprite
+class FlyingBird(pygame.sprite.Sprite):
+    #method that initializes the flying bird sprite
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.image.load("Cloud.gif")
+        self.image = pygame.image.load("flying_bird.gif")
         self.image = self.image.convert()
         self.rect = self.image.get_rect()
         self.reset()
+    #end of __init__ method
 
+    #method that updates the flying bird sprite
     def update(self):
-        self.rect.centerx += self.dx
+        self.rect.centerx -= self.dx
         self.rect.centery += self.dy
-        if self.rect.top > screen.get_height():
-            self.reset()
+        #if the flying bird sprite hits the bottom of the screen,
+        #the top of the screen or passes the left side of the
+        #screen run the reset method
+        if self.rect.top > screen.get_height() or self.rect.bottom < 0 or self.rect.right < 0:
+            self.reset()       
+    #end of update method
     
+    #method reset the flying bird sprite
     def reset(self):
-        self.rect.bottom = 0
-        self.rect.centerx = random.randrange(0, screen.get_width())
-        self.dy = random.randrange(5, 10)
-        self.dx = random.randrange(-2, 2)
-    
+        #randomly select the height the coin will be spawn from
+        randomy = random.randint(0, 460)
+        self.rect.center = (640, randomy)
+        self.dx = random.randrange(12, 15)
+        self.dy = random.randrange(-3, 3)
+    #end of reset method
+#end of flying bird class
+
 class Ocean(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
@@ -160,14 +173,14 @@ def game():
     screen.blit(background, (0, 0))
     balloonMan = BalloonMan()
     coin = Coin()
-    cloud1 = Cloud()
-    cloud2 = Cloud()
-    cloud3 = Cloud()
+    flyingBird1 = FlyingBird()
+    flyingBird2 = FlyingBird()
+    flyingBird3 = FlyingBird()
     ocean = Ocean()
     scoreboard = Scoreboard()
 
-    friendSprites = pygame.sprite.OrderedUpdates(balloon, balloonMan, ocean, coin)
-    cloudSprites = pygame.sprite.Group(cloud1, cloud2, cloud3)
+    friendSprites = pygame.sprite.OrderedUpdates(ocean, balloonMan, balloon, coin)
+    flyingBirdSprites = pygame.sprite.Group(flyingBird1, flyingBird2, flyingBird3)
     scoreSprite = pygame.sprite.Group(scoreboard)
 
     clock = pygame.time.Clock()
@@ -187,21 +200,21 @@ def game():
             coin.reset()
             scoreboard.score += 100
 
-        hitClouds = pygame.sprite.spritecollide(balloonMan, cloudSprites, False)
-        if hitClouds:
+        hitFlyingBirds = pygame.sprite.spritecollide(balloonMan, flyingBirdSprites, False)
+        if hitFlyingBirds:
             plane.sndThunder.play()
             scoreboard.lives -= 1
             if scoreboard.lives <= 0:
                 keepGoing = False
-            for theCloud in hitClouds:
-                theCloud.reset()
+            for theFlyingBirds in hitFlyingBirds:
+                theFlyingBirds.reset()
         
         friendSprites.update()
-        cloudSprites.update()
+        flyingBirdSprites.update()
         scoreSprite.update()
         
         friendSprites.draw(screen)
-        cloudSprites.draw(screen)
+        flyingBirdSprites.draw(screen)
         scoreSprite.draw(screen)
         
         pygame.display.flip()

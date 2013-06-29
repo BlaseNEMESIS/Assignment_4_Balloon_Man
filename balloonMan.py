@@ -8,6 +8,7 @@
 #If you run out of ballons the game is over.
 
 #Version 0.1 - Code from Lesson 7
+#Version 0.2 - Added the Balloon Man Class
 
 import pygame, random
 pygame.init()
@@ -29,10 +30,33 @@ class Plane(pygame.sprite.Sprite):
             self.sndThunder = pygame.mixer.Sound("thunder.ogg")
             self.sndEngine = pygame.mixer.Sound("engine.ogg")
             self.sndEngine.play(-1)
+
+#Creates the balloon man sprite and its controls
+class BalloonMan(pygame.sprite.Sprite):
+    #first initializtion of the ballon man
+    def __init__(self):
+        #load the sprite onto the screen
+        pygame.sprite.Sprite.__init__(self)
+        self.image = pygame.image.load("balloon_man.gif")
+        self.image = self.image.convert()
+        self.rect = self.image.get_rect()
+        #if there is no pygame mixer the sound won't work
+        if not pygame.mixer:
+            print("problem with sound")
+        else:
+            pygame.mixer.init()
+            self.sndYay = pygame.mixer.Sound("yay.ogg")
+            self.sndThunder = pygame.mixer.Sound("thunder.ogg")
+            self.sndEngine = pygame.mixer.Sound("engine.ogg")
+            self.sndEngine.play(-1)
+    #end of __init__ method    
         
+    #update the sprite of balloon man  
     def update(self):
         mousex, mousey = pygame.mouse.get_pos()
-        self.rect.center = (mousex, 430)
+        self.rect.center = (30, mousey)
+    #end of update method
+#end of the balloonMan class
                 
 class Island(pygame.sprite.Sprite):
     def __init__(self):
@@ -97,7 +121,7 @@ class Scoreboard(pygame.sprite.Sprite):
         self.font = pygame.font.SysFont("None", 50)
         
     def update(self):
-        self.text = "planes: %d, score: %d" % (self.lives, self.score)
+        self.text = "Balloons: %d, score: %d" % (self.lives, self.score)
         self.image = self.font.render(self.text, 1, (255, 255, 0))
         self.rect = self.image.get_rect()
     
@@ -107,7 +131,7 @@ def game():
     background = pygame.Surface(screen.get_size())
     background.fill((0, 0, 0))
     screen.blit(background, (0, 0))
-    plane = Plane()
+    balloonMan = BalloonMan()
     island = Island()
     cloud1 = Cloud()
     cloud2 = Cloud()
@@ -115,7 +139,7 @@ def game():
     ocean = Ocean()
     scoreboard = Scoreboard()
 
-    friendSprites = pygame.sprite.OrderedUpdates(ocean, island, plane)
+    friendSprites = pygame.sprite.OrderedUpdates(ocean, island, balloonMan)
     cloudSprites = pygame.sprite.Group(cloud1, cloud2, cloud3)
     scoreSprite = pygame.sprite.Group(scoreboard)
 
@@ -131,12 +155,12 @@ def game():
         
         #check collisions
         
-        if plane.rect.colliderect(island.rect):
-            plane.sndYay.play()
+        if balloonMan.rect.colliderect(island.rect):
+            balloonMan.sndYay.play()
             island.reset()
             scoreboard.score += 100
 
-        hitClouds = pygame.sprite.spritecollide(plane, cloudSprites, False)
+        hitClouds = pygame.sprite.spritecollide(balloonMan, cloudSprites, False)
         if hitClouds:
             plane.sndThunder.play()
             scoreboard.lives -= 1
@@ -155,7 +179,7 @@ def game():
         
         pygame.display.flip()
     
-    plane.sndEngine.stop()
+    balloonMan.sndEngine.stop()
     #return mouse cursor
     pygame.mouse.set_visible(True) 
     return scoreboard.score
@@ -163,10 +187,10 @@ def game():
 def instructions(score):
     pygame.display.set_caption("Mail Pilot!")
 
-    plane = Plane()
+    balloonMan = BalloonMan()
     ocean = Ocean()
     
-    allSprites = pygame.sprite.Group(ocean, plane)
+    allSprites = pygame.sprite.Group(ocean, balloonMan)
     insFont = pygame.font.SysFont(None, 50)
     insLabels = []
     instructions = (

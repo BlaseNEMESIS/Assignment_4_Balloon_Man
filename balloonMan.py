@@ -1,7 +1,7 @@
 # Source File Name: balloonMan.py
 # Author's Name: Jonathan Hodder
 # Last Modified By: Jonathan Hodder
-# Date Last Modified: Saturday June 29th 2013
+# Date Last Modified: Monday July 1st 2013
 #Program Description: You are the balloon man.  Fly around the sky collecting coins to increase
 #your score.  Also keep an eye out for balloons as they will give you an extra balloon.  Watch
 #out though birds fly through the sky and colliding with them will cause you to lose a balloon.
@@ -22,8 +22,10 @@
 #one life.  If you run out of lives the game resets
 #Version 0.7 - Added an intro to the game and when you lose the intro loads up with your last
 #score - Need to work on making it so that when you lose you can actually quit out with escape
+#Version 0.8 - Have the game over screen working also allow you to quit out when you 
+#select escape on the game over screen or intro screen.
 
-import pygame, random
+import pygame, random, sys
 pygame.init()
 
 screen = pygame.display.set_mode((640, 480))
@@ -162,7 +164,7 @@ class Scoreboard(pygame.sprite.Sprite):
     
     #update the scoreboard    
     def update(self):
-        self.text = "lives: %d                        score: %d" % (self.lives, self.score)
+        self.text = "lives: %d, score: %d" % (self.lives, self.score)
         self.image = self.font.render(self.text, 1, (255, 255, 0))
         self.rect = self.image.get_rect()
     #end of update method
@@ -253,7 +255,7 @@ def game():
                 scoreboard.lives = 5
                 score = scoreboard.score
                 scoreboard.score = 0
-                intro(score)
+                gameOver(score)
             for theFlyingBird in hitEnemies:
                 theFlyingBird.reset()
                 
@@ -273,11 +275,62 @@ def game():
     
     #return mouse cursor
     pygame.mouse.set_visible(True)
-    return scoreboard.score()
+    return score
 #end of game method
 
+#game over method display the game over screen
+def gameOver(score):
+    #create a varaible to store the skybackground
+    skyBackground = SkyBackground()
+    #load the skybackground into allSprites
+    allSprites = pygame.sprite.Group(skyBackground)
+    insFont = pygame.font.SysFont(None, 40)
+    
+    #set the loss variable
+    loss = (
+    "Ballon Man... Has fallen.",
+    "You score is: %d" % score ,
+    "",
+    "Click the mouse to go back to the intro,", 
+    "escape to quit..."
+    )
+    
+    #add the instructions
+    insLabels = []    
+    for line in loss:
+        tempLabel = insFont.render(line, 1, (255, 255, 0))
+        insLabels.append(tempLabel)
+    
+    keepGoing = True
+    clock = pygame.time.Clock()
+    pygame.mouse.set_visible(False)
+    while keepGoing:
+        clock.tick(30)
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                sys.exit()
+            #if the user presses the mouse down start the game
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                keepGoing = False
+                intro()
+            #if the user enter the escape key they are done playing
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    sys.exit()
+        
+        allSprites.update()
+        allSprites.draw(screen)
+
+        #display the loss message on the screen
+        for i in range(len(insLabels)):
+            screen.blit(insLabels[i], (50, 30*i))
+
+        pygame.display.flip()
+    pygame.mouse.set_visible(True)
+#end of gameOver method
+    
 #intro method runs the introduction to the game
-def intro(score):
+def intro():
     #create variables to store sprites
     balloonMan = BalloonMan()
     skyBackground = SkyBackground()
@@ -288,7 +341,7 @@ def intro(score):
 
     #set the instructions variable
     instructions = (
-    "Balloon Man.     Last score: %d" % score ,
+    "Balloon Man.",
     "Instructions:  Your are the Balloon Man,.",
     "Fly over coins to collect points,",
     "but be careful not to fly too close",    
@@ -298,7 +351,7 @@ def intro(score):
     "",
     "Good Luck!",
     "",
-    "Click to start, escape to quit..."
+    "Click the mouse to start, escape to quit..."
     )
 
     #add the instructions
@@ -314,18 +367,15 @@ def intro(score):
         clock.tick(30)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                keepGoing = False
-                donePlaying = True
+                sys.exit()
             #if the user presses the mouse down start the game
             if event.type == pygame.MOUSEBUTTONDOWN:
                 keepGoing = False
-                donePlaying = False
                 game()
             #if the user enter the escape key they are done playing
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
-                    keepGoing = False
-                    donePlaying = True
+                    sys.exit()
     
         allSprites.update()
         allSprites.draw(screen)
@@ -342,10 +392,7 @@ def intro(score):
 
 #Main method    
 def main():
-    donePlaying = False
-    score = 0
-    intro(score)
+    intro()
 #end of main method
 if __name__ == "__main__":
     main()
-            

@@ -1,12 +1,25 @@
-# Source File Name: bmCollision.py
+# Source File Name: balloonMan.py
 # Author's Name: Jonathan Hodder
 # Last Modified By: Jonathan Hodder
-# Date Last Modified: Saturday June 29th 2013
-#Program Description: This is the test code for the object collision.  
-#My goal in this code is have object collision cause different effects 
+# Date Last Modified: July 11th 2013
+#Program Description: You are the balloon man.  Fly around the sky collecting coins to increase
+#your score.  Also keep an eye out for balloons as they will give you an extra balloon.  Watch
+#out though birds fly through the sky and colliding with them will cause you to lose a balloon.
+#If you run out of ballons the game is over.
 
 #Version 0.1 - Code from Lesson 7
-#Version 1.0 - Have the sounds working when objects collider with each other
+#Version 0.2 - Added the Balloon Man Class
+#Version 0.25 - Added the Coin Class - Also adjusted image sizes
+#Version 0.3 - Added the Balloon Class - Adjusted image sizes again
+#Version 0.35 - Added the Flying Bird Class
+#Version 0.4 - Removed the orignal code not looked at yet.  Added collision logic to my code
+#with sound effects.  The sound effects are from lesson 7.  Will add original sounds to my
+#code later on.
+#Version 0.5 - Added screen scrolling for the sky background and also added 5 birds to the game
+#instead of just one bird
+#Version 0.6 - Added a scoreboard to the game.  When colliding with a balloon you gain one life
+#When colliding with a coin you gain 50 points.  When colliding with a flying bird you lose
+#one life.  If you run out of lives the game resets
 
 import pygame, random
 pygame.init()
@@ -103,7 +116,7 @@ class Coin(pygame.sprite.Sprite):
     #end of reset method
 #end of Coin class
 
-#method flying bird creates a flying bird sprite
+#class flying bird creates a flying bird sprite
 class FlyingBird(pygame.sprite.Sprite):
     #method that initializes the flying bird sprite
     def __init__(self):
@@ -135,11 +148,55 @@ class FlyingBird(pygame.sprite.Sprite):
     #end of reset method
 #end of flying bird class
 
+#create the scoreboard sprite
+class Scoreboard(pygame.sprite.Sprite):
+    #initialize the scoreboard
+    def __init__(self):
+        pygame.sprite.Sprite.__init__(self)
+        self.lives = 5
+        self.score = 0
+        self.font = pygame.font.SysFont("None", 50)
+    #end of __init__ method
+    
+    #update the scoreboard    
+    def update(self):
+        self.text = "lives: %d, score: %d" % (self.lives, self.score)
+        self.image = self.font.render(self.text, 1, (255, 255, 0))
+        self.rect = self.image.get_rect()
+    #end of update method
+#end of Scoreboard Class
+
+#Creates the sky image scrolling background
+class SkyBackground(pygame.sprite.Sprite):
+    #initialize the sky background
+    def __init__(self):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = pygame.image.load("sky_background.gif")
+        self.image = self.image.convert()
+        self.rect = self.image.get_rect()
+        self.dx = 5
+        self.reset()
+    #end of __init__ method
+    
+    #update the sky background    
+    def update(self):
+        self.rect.left -= self.dx
+        if self.rect.left <= -560:
+            self.reset() 
+    #end of update method
+    
+    #reset the sky background
+    def reset(self):
+        self.rect.right = 1000
+
+    #end of the reset method
+#end SkyBackground class
+
 #Main method    
 def main():
     #create game screen
     screen = pygame.display.set_mode((640, 480))
-    pygame.display.set_caption("Balloon Man! mpCollision - Collisions and Sounds")
+    pygame.display.set_caption("Balloon Man! bmScore.py - Scoreboard")
     #create the background for the game screen
     background = pygame.Surface(screen.get_size())
     background.fill((0, 0, 255))
@@ -148,10 +205,21 @@ def main():
     balloon = Balloon()
     balloonMan = BalloonMan()
     coin = Coin()
-    flyingBird = FlyingBird()
     
-    #store the sprite variables into allSprites
-    allSprites = pygame.sprite.OrderedUpdates(balloon, coin, balloonMan, flyingBird)
+    #enemy variables
+    flyingBird1 = FlyingBird()
+    flyingBird2 = FlyingBird()
+    flyingBird3 = FlyingBird()
+    flyingBird4 = FlyingBird()
+    flyingBird5 = FlyingBird()
+    
+    scoreboard = Scoreboard()
+    skyBackground = SkyBackground()
+    
+    #store the sprite variables into good sprites, enemy sprites and score Sprite
+    goodSprites = pygame.sprite.OrderedUpdates(skyBackground, balloon, coin, balloonMan)
+    enemySprites = pygame.sprite.Group(flyingBird1, flyingBird2, flyingBird3, flyingBird4, flyingBird5)
+    scoreSprite = pygame.sprite.Group(scoreboard)
     #set the fps
     clock = pygame.time.Clock()
     keepGoing = True
@@ -163,21 +231,39 @@ def main():
             if event.type == pygame.QUIT:
                 keepGoing = False
                 
-        #check collisions
+        #check collisions if you hit the balloon give the player a life
         if balloonMan.rect.colliderect(balloon.rect):
             balloonMan.sndYay.play()
             balloon.reset()
+            scoreboard.lives +=1
+        
+        #check collision if you hit the coin increase score by 50    
         if balloonMan.rect.colliderect(coin.rect):
             balloonMan.sndYay.play()
             coin.reset()
-        if balloonMan.rect.colliderect(flyingBird.rect):
-            balloonMan.sndThunder.play()
-            flyingBird.reset()
+            scoreboard.score += 50
         
-        #clear the sprites, update them and then drawn them        
-        allSprites.clear(screen, background)
-        allSprites.update()
-        allSprites.draw(screen)
+        #check collision for hitting enemies    
+        hitEnemies = pygame.sprite.spritecollide(balloonMan, enemySprites, False)
+        if hitEnemies:
+            balloonMan.sndThunder.play()
+            scoreboard.lives -= 1
+            #if your run out of lives run a game over
+            if scoreboard.lives <= 0:
+                print("Game over!")
+                scoreboard.lives = 5
+                scoreboard.score = 0
+            for theFlyingBird in hitEnemies:
+                theFlyingBird.reset()
+                
+        #update the sprites and then drawn them        
+        goodSprites.update()
+        enemySprites.update()
+        scoreSprite.update()
+        
+        goodSprites.draw(screen)
+        enemySprites.draw(screen)
+        scoreSprite.draw(screen)
         
         pygame.display.flip()
     

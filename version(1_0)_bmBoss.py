@@ -1,11 +1,33 @@
-# Source File Name: bmGameOver.py
+# Source File Name: balloonMan.py
 # Author's Name: Jonathan Hodder
 # Last Modified By: Jonathan Hodder
-# Date Last Modified: Monday July 1st 2013
-#Program Description: This is the test code for the game over screen
-#My goal in this code is to have the game over happen after you lose all your lives.
+# Date Last Modified: July 14th 2013
+#Program Description: You are the balloon man.  Fly around the sky collecting coins to increase
+#your score.  Also keep an eye out for balloons as they will give you an extra balloon.  Watch
+#out though birds fly through the sky and colliding with them will cause you to lose a balloon.
+#If you run out of ballons the game is over.
 
-#Version 1.0 - Have the game over screen working also allow you to quit out when you select escape.
+#Version 0.1 - Code from Lesson 7
+#Version 0.2 - Added the Balloon Man Class
+#Version 0.25 - Added the Coin Class - Also adjusted image sizes
+#Version 0.3 - Added the Balloon Class - Adjusted image sizes again
+#Version 0.35 - Added the Flying Bird Class
+#Version 0.4 - Removed the orignal code not looked at yet.  Added collision logic to my code
+#with sound effects.  The sound effects are from lesson 7.  Will add original sounds to my
+#code later on.
+#Version 0.5 - Added screen scrolling for the sky background and also added 5 birds to the game
+#instead of just one bird
+#Version 0.6 - Added a scoreboard to the game.  When colliding with a balloon you gain one life
+#When colliding with a coin you gain 50 points.  When colliding with a flying bird you lose
+#one life.  If you run out of lives the game resets
+#Version 0.7 - Added an intro to the game and when you lose the intro loads up with your last
+#score - Need to work on making it so that when you lose you can actually quit out with escape
+#Version 0.8 - Have the game over screen working also allow you to quit out when you 
+#select escape on the game over screen or intro screen.
+#Version 0.9 - Images alpha corrected - Added clouds to provide extra challenge and to have the
+#background seem to move. Sound and music added to game.
+#Version 1.0 - Added boss enemy with a music change. Modified images - changed cloud image and
+#added color version for common enemies.
 
 import pygame, random, sys
 pygame.init()
@@ -58,11 +80,9 @@ class BalloonMan(pygame.sprite.Sprite):
         else:
             #initialize the sounds
             pygame.mixer.init()
-            self.sndYay = pygame.mixer.Sound("yay.ogg")
-            self.sndThunder = pygame.mixer.Sound("thunder.ogg")
-            self.sndEngine = pygame.mixer.Sound("engine.ogg")
-            self.sndEngine.play(-1)
-
+            self.sndBalloonBlow = pygame.mixer.Sound("balloonBlow.wav")
+            self.sndCoinSound = pygame.mixer.Sound("CoinSound.wav")
+            self.sndBalloonPop = pygame.mixer.Sound("balloonPop.wav")
     #end of __init__ method    
         
     #update the sprite of balloon man  
@@ -71,6 +91,38 @@ class BalloonMan(pygame.sprite.Sprite):
         self.rect.center = (mousex, mousey)
     #end of update method
 #end of the balloonMan class
+
+#class Boss creates a giant flying bird sprite
+class Boss(pygame.sprite.Sprite):
+    #method that initializes the flying bird sprite
+    def __init__(self):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = pygame.image.load("flying_bird_boss.gif")
+        self.image = self.image.convert()
+        self.rect = self.image.get_rect()
+        self.reset()
+    #end of __init__ method
+
+    #method that updates the flying bird sprite
+    def update(self):
+        self.rect.centerx -= self.dx
+        self.rect.centery += self.dy
+        #if the flying bird sprite hits the bottom of the screen,
+        #the top of the screen or passes the left side of the
+        #screen run the reset method
+        if self.rect.top > screen.get_height() or self.rect.bottom < 0 or self.rect.right < 0:
+            self.reset()       
+    #end of update method
+    
+    #method reset the flying bird sprite
+    def reset(self):
+        #randomly select the height the coin will be spawn from
+        randomy = random.randint(0, 460)
+        self.rect.center = (640, randomy)
+        self.dx = random.randrange(20, 30)
+        self.dy = random.randrange(-3, 3)
+    #end of reset method
+#end of boss class
         
 #Creates the coin sprite and its movement      
 class Coin(pygame.sprite.Sprite):
@@ -102,12 +154,54 @@ class Coin(pygame.sprite.Sprite):
     #end of reset method
 #end of Coin class
 
+#creates the cloud sprite
+class Cloud (pygame.sprite.Sprite):
+#method to initialize the coin sprite
+    def __init__(self):
+        #create the coin sprite
+        pygame.sprite.Sprite.__init__(self)
+        self.image = pygame.image.load("cloud.gif")
+        self.image = self.image.convert()
+        self.rect = self.image.get_rect()
+        self.reset()
+        
+        self.dx = 5
+    #end of initialize method
+    
+    #method to update coin sprite
+    def update(self):
+        self.rect.centerx -= self.dx
+        self.rect.centery += self.dy
+        #if the cloud bird sprite hits the bottom of the screen,
+        #the top of the screen or passes the left side of the
+        #screen run the reset method
+        if self.rect.top > screen.get_height() or self.rect.bottom < 0 or self.rect.right < 0:
+            self.reset() 
+    #end of update method
+    
+    #method to reset coin sprite       
+    def reset(self):
+        #randomly select the height the coin will be spawn from
+        randomy = random.randint(0, 460)
+        self.rect.center = (640, randomy)
+        self.dx = random.randrange(5)
+        self.dy = random.randrange(-3, 3)
+    #end of reset method
+
+    #end of reset method
+#end of Coin class
 #class flying bird creates a flying bird sprite
 class FlyingBird(pygame.sprite.Sprite):
     #method that initializes the flying bird sprite
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.image.load("flying_bird.gif")
+        birdType = random.randint(0, 3)
+        if birdType == 0:
+            self.image = pygame.image.load("flying_bird_red.gif")
+        elif birdType == 1:
+            self.image = pygame.image.load("flying_bird_yellow.gif")
+        else:
+            self.image = pygame.image.load("flying_bird.gif")
         self.image = self.image.convert()
         self.rect = self.image.get_rect()
         self.reset()
@@ -189,6 +283,8 @@ def game():
     balloon = Balloon()
     balloonMan = BalloonMan()
     coin = Coin()
+    cloud1 = Cloud()
+    cloud2 = Cloud()
     
     #enemy variables
     flyingBird1 = FlyingBird()
@@ -196,6 +292,7 @@ def game():
     flyingBird3 = FlyingBird()
     flyingBird4 = FlyingBird()
     flyingBird5 = FlyingBird()
+    boss = Boss()
     
     scoreboard = Scoreboard()
     skyBackground = SkyBackground()
@@ -203,6 +300,7 @@ def game():
     #store the sprite variables into good sprites, enemy sprites and score Sprite
     goodSprites = pygame.sprite.OrderedUpdates(skyBackground, balloon, coin, balloonMan)
     enemySprites = pygame.sprite.Group(flyingBird1, flyingBird2, flyingBird3, flyingBird4, flyingBird5)
+    obstacleSprites = pygame.sprite.OrderedUpdates(cloud1, cloud2)
     scoreSprite = pygame.sprite.Group(scoreboard)
     #set the fps
     clock = pygame.time.Clock()
@@ -217,20 +315,20 @@ def game():
                 
         #check collisions if you hit the balloon give the player a life
         if balloonMan.rect.colliderect(balloon.rect):
-            balloonMan.sndYay.play()
+            balloonMan.sndBalloonBlow.play()
             balloon.reset()
             scoreboard.lives +=1
         
         #check collision if you hit the coin increase score by 50    
         if balloonMan.rect.colliderect(coin.rect):
-            balloonMan.sndYay.play()
+            balloonMan.sndCoinSound.play()
             coin.reset()
             scoreboard.score += 50
         
         #check collision for hitting enemies    
         hitEnemies = pygame.sprite.spritecollide(balloonMan, enemySprites, False)
         if hitEnemies:
-            balloonMan.sndThunder.play()
+            balloonMan.sndBalloonPop.play()
             scoreboard.lives -= 1
             #if your run out of lives run a game over
             if scoreboard.lives <= 0:
@@ -240,32 +338,44 @@ def game():
                 gameOver(score)
             for theFlyingBird in hitEnemies:
                 theFlyingBird.reset()
-                
+        
+        #add a boss enemy if player reaches 1000 score
+        if scoreboard.score == 1000:
+            #load the music
+            pygame.mixer.music.load('Boss Song.wav')
+            pygame.mixer.music.play(-1)
+            enemySprites = pygame.sprite.Group(flyingBird1, flyingBird2, flyingBird3, flyingBird4, flyingBird5, boss)        
         #update the sprites and then drawn them        
         goodSprites.update()
         enemySprites.update()
+        obstacleSprites.update()
         scoreSprite.update()
         
         goodSprites.draw(screen)
         enemySprites.draw(screen)
+        obstacleSprites.draw(screen)
         scoreSprite.draw(screen)
         
         pygame.display.flip()
     
-    #turn off the snd Engine for the balloon man
-    balloonMan.sndEngine.stop()
-    
     #return mouse cursor
     pygame.mouse.set_visible(True)
-    return score
+
 #end of game method
 
 #game over method display the game over screen
 def gameOver(score):
+    if score >= 1000:
+        #load the music
+        pygame.mixer.music.load('MGS3 Theme.wav')
+        pygame.mixer.music.play(-1)
+        
     #create a varaible to store the skybackground
     skyBackground = SkyBackground()
+    cloud1 = Cloud()
+    cloud2 = Cloud()
     #load the skybackground into allSprites
-    allSprites = pygame.sprite.Group(skyBackground)
+    allSprites = pygame.sprite.OrderedUpdates(skyBackground, cloud1, cloud2)
     insFont = pygame.font.SysFont(None, 40)
     
     #set the loss variable
@@ -280,7 +390,7 @@ def gameOver(score):
     #add the instructions
     insLabels = []    
     for line in loss:
-        tempLabel = insFont.render(line, 1, (255, 255, 0))
+        tempLabel = insFont.render(line, 1, (0, 0, 0))
         insLabels.append(tempLabel)
     
     keepGoing = True
@@ -316,9 +426,11 @@ def intro():
     #create variables to store sprites
     balloonMan = BalloonMan()
     skyBackground = SkyBackground()
+    cloud1 = Cloud()
+    cloud2 = Cloud()
     
     #load the balloon man and skybackground into the allSprites variable
-    allSprites = pygame.sprite.OrderedUpdates(skyBackground, balloonMan)
+    allSprites = pygame.sprite.OrderedUpdates(skyBackground, balloonMan, cloud1, cloud2)
     insFont = pygame.font.SysFont(None, 40)
 
     #set the instructions variable
@@ -327,9 +439,9 @@ def intro():
     "Instructions:  Your are the Balloon Man,.",
     "Fly over coins to collect points,",
     "but be careful not to fly too close",    
-    "to the flying birds. If the birds hit you lose ",
-    "a life but never fear collecting balloons,",
-    "will give you more health."
+    "to the flying birds. If the birds hit you,",
+    "you'll lose a life but never fear collecting", 
+    "balloons will give you more health.",
     "",
     "Good Luck!",
     "",
@@ -339,7 +451,7 @@ def intro():
     #add the instructions
     insLabels = []    
     for line in instructions:
-        tempLabel = insFont.render(line, 1, (255, 255, 0))
+        tempLabel = insFont.render(line, 1, (0, 0, 0))
         insLabels.append(tempLabel)
  
     keepGoing = True
@@ -367,15 +479,16 @@ def intro():
             screen.blit(insLabels[i], (50, 30*i))
 
         pygame.display.flip()
-        
-    balloonMan.sndEngine.stop()
+
     pygame.mouse.set_visible(True)
 #end of intro method
 
 #Main method    
 def main():
+    #load the music
+    pygame.mixer.music.load('MGS3 Theme.wav')
+    pygame.mixer.music.play(-1)
     intro()
 #end of main method
 if __name__ == "__main__":
     main()
-            

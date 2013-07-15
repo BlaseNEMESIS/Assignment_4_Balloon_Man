@@ -1,12 +1,14 @@
-# Source File Name: bmBalloonMan.py
+# Source File Name: balloonMan.py
 # Author's Name: Jonathan Hodder
 # Last Modified By: Jonathan Hodder
-# Date Last Modified: Saturday June 29th 2013
-#Program Description: This is the test code for the BallonMan Sprite.  I want the balloon man
-#to appear on the screen and also to move up and down the screen depending on the mouse moving
+# Date Last Modified: July 11th 2013
+#Program Description: You are the balloon man.  Fly around the sky collecting coins to increase
+#your score.  Also keep an eye out for balloons as they will give you an extra balloon.  Watch
+#out though birds fly through the sky and colliding with them will cause you to lose a balloon.
+#If you run out of ballons the game is over.
 
 #Version 0.1 - Code from Lesson 7
-#Version 1.0 - The balloon man moves up and down the screen
+#Version 0.2 - Added the Balloon Man Class
     
 import pygame
 pygame.init()

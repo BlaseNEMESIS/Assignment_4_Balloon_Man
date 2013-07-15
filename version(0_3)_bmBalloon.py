@@ -1,13 +1,16 @@
-# Source File Name: bmFlyingBird.py
+# Source File Name: balloonMan.py
 # Author's Name: Jonathan Hodder
 # Last Modified By: Jonathan Hodder
-# Date Last Modified: Saturday June 29th 2013
-#Program Description: This is the test code for the Flying Bird sprite.  
-#My goal in this code is to add a flying bird to the screen and have it move. 
+# Date Last Modified: Monday July 1st 2013
+#Program Description: You are the balloon man.  Fly around the sky collecting coins to increase
+#your score.  Also keep an eye out for balloons as they will give you an extra balloon.  Watch
+#out though birds fly through the sky and colliding with them will cause you to lose a balloon.
+#If you run out of ballons the game is over.
 
 #Version 0.1 - Code from Lesson 7
-#Version 1.0 - Completed goals for flying bird sprite class - flying bird randomly moves 
-#to the left of the screen possibly adjusting its y posistion.
+#Version 0.2 - Added the Balloon Man Class
+#Version 0.25 - Added the Coin Class - Also adjusted image sizes
+#Version 0.3 - Added the Balloon Class - Adjusted image sizes again
 
 import pygame, random
 pygame.init()
@@ -92,43 +95,11 @@ class Coin(pygame.sprite.Sprite):
     #end of reset method
 #end of Coin class
 
-#method flying bird creates a flying bird sprite
-class FlyingBird(pygame.sprite.Sprite):
-    #method that initializes the flying bird sprite
-    def __init__(self):
-        pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.image.load("flying_bird.gif")
-        self.image = self.image.convert()
-        self.rect = self.image.get_rect()
-        self.reset()
-    #end of __init__ method
-
-    #method that updates the flying bird sprite
-    def update(self):
-        self.rect.centerx -= self.dx
-        self.rect.centery += self.dy
-        #if the flying bird sprite hits the bottom of the screen,
-        #the top of the screen or passes the left side of the
-        #screen run the reset method
-        if self.rect.top > screen.get_height() or self.rect.bottom < 0 or self.rect.right < 0:
-            self.reset()       
-    #end of update method
-    
-    #method reset the flying bird sprite
-    def reset(self):
-        #randomly select the height the coin will be spawn from
-        randomy = random.randint(0, 460)
-        self.rect.center = (640, randomy)
-        self.dx = random.randrange(12, 15)
-        self.dy = random.randrange(-3, 3)
-    #end of reset method
-#end of flying bird class
-
 #Main method    
 def main():
     #create game screen
     screen = pygame.display.set_mode((640, 480))
-    pygame.display.set_caption("Balloon Man! mpFlyingBird - adding the Flying Bird Sprite")
+    pygame.display.set_caption("Balloon Man! mpCoin - adding the Coin Sprite")
     #create the background for the game screen
     background = pygame.Surface(screen.get_size())
     background.fill((0, 0, 255))
@@ -137,10 +108,9 @@ def main():
     balloon = Balloon()
     balloonMan = BalloonMan()
     coin = Coin()
-    flyingBird = FlyingBird()
     
     #store the sprite variables into allSprites
-    allSprites = pygame.sprite.OrderedUpdates(balloon, coin, balloonMan, flyingBird)
+    allSprites = pygame.sprite.Group(balloon, coin, balloonMan)
     #set the fps
     clock = pygame.time.Clock()
     keepGoing = True

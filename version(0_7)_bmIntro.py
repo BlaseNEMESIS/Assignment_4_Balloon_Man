@@ -1,13 +1,28 @@
-# Source File Name: bmIntro.py
+# Source File Name: balloonMan.py
 # Author's Name: Jonathan Hodder
 # Last Modified By: Jonathan Hodder
-# Date Last Modified: Monday June 29th 2013
-#Program Description: This is the test code for the intro 
-#My goal in this code is to have the intro work and to have the intro 
-#appear after you lose a game.
+# Date Last Modified: July 11th 2013
+#Program Description: You are the balloon man.  Fly around the sky collecting coins to increase
+#your score.  Also keep an eye out for balloons as they will give you an extra balloon.  Watch
+#out though birds fly through the sky and colliding with them will cause you to lose a balloon.
+#If you run out of ballons the game is over.
 
 #Version 0.1 - Code from Lesson 7
-#Version 1.0 - Have the intro screen working.
+#Version 0.2 - Added the Balloon Man Class
+#Version 0.25 - Added the Coin Class - Also adjusted image sizes
+#Version 0.3 - Added the Balloon Class - Adjusted image sizes again
+#Version 0.35 - Added the Flying Bird Class
+#Version 0.4 - Removed the orignal code not looked at yet.  Added collision logic to my code
+#with sound effects.  The sound effects are from lesson 7.  Will add original sounds to my
+#code later on.
+#Version 0.5 - Added screen scrolling for the sky background and also added 5 birds to the game
+#instead of just one bird
+#Version 0.6 - Added a scoreboard to the game.  When colliding with a balloon you gain one life
+#When colliding with a coin you gain 50 points.  When colliding with a flying bird you lose
+#one life.  If you run out of lives the game resets
+#Version 0.7 - Added an intro to the game and when you lose the intro loads up with your last
+#score - Need to work on making it so that when you lose you can actually quit out with escape
+
 
 import pygame, random
 pygame.init()
